@@ -1,64 +1,64 @@
-<!DOCTYPE html><html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Click the Box - Versi Lengkap</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      background: var(--bg-color);
-      color: var(--text-color);
-      margin: 0;
-      padding: 0;
-      transition: background 0.5s, color 0.5s;
-    }:root {
-  --bg-color: #f0f8ff;
-  --text-color: #000;
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f0f8ff;
+  color: #333;
+  transition: background-color 0.5s, color 0.5s;
 }
 
-.dark-mode {
-  --bg-color: #1e1e1e;
-  --text-color: #fff;
+body.dark {
+  background-color: #222;
+  color: #ddd;
 }
 
-h1 {
-  margin-top: 20px;
+.container {
+  max-width: 600px;
+  margin: 20px auto;
+  text-align: center;
 }
 
 #gameArea {
   position: relative;
   width: 100%;
-  height: 70vh;
+  height: 60vh;
   background-color: #e6f2ff;
   border: 2px solid #0099cc;
-  overflow: hidden;
   margin-top: 20px;
+  overflow: hidden;
+  border-radius: 10px;
+  transition: background-color 0.5s;
+}
+
+body.dark #gameArea {
+  background-color: #333;
+  border-color: #66ccff;
 }
 
 .box {
   position: absolute;
-  width: 50px;
-  height: 50px;
-  background-color: #ff6666;
-  cursor: pointer;
   border-radius: 10px;
+  cursor: pointer;
+  background-color: #ff6666;
+  transition: background-color 0.3s;
 }
 
-#scoreBoard {
-  margin-top: 20px;
-  font-size: 18px;
+body.dark .box {
+  background-color: #ff4444;
 }
 
 button {
-  padding: 10px 20px;
+  margin: 10px 5px;
+  padding: 10px 15px;
   font-size: 16px;
-  margin: 5px;
   cursor: pointer;
+  border-radius: 5px;
+  border: none;
+  background-color: #0099cc;
+  color: white;
+  transition: background-color 0.3s;
 }
 
-  </style>
-</head>
-<body>
-  <h1>🎯 Click the Box - Versi Lengkap</h1>
-  <div id="scoreBoard
+button:hover {
+  background-color: #007799;
+}
