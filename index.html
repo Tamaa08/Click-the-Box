@@ -2,8 +2,9 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Click the Box Game</title>
+  <title>Click the Box Game 🎶</title>
   <style>
+    /* Sama seperti sebelumnya dengan tambahan tombol musik */
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: 'Segoe UI', sans-serif;
@@ -103,11 +104,148 @@
     <button id="startBtn">Start Game</button>
     <button id="toggleThemeBtn">Toggle Theme</button>
     <button id="challengeModeBtn">Challenge Mode</button>
+    <button id="musicBtn">🔊 Music</button>
     <div id="gameArea"></div>
   </div>
+
+  <!-- Musik latar -->
+  <audio id="bgMusic" loop>
+    <source src="bg-music.mp3" type="audio/mpeg">
+    Your browser does not support the audio tag.
+  </audio>
+
   <script>
     const gameArea = document.getElementById("gameArea");
     const scoreBoard = document.getElementById("scoreBoard");
     const startBtn = document.getElementById("startBtn");
     const toggleThemeBtn = document.getElementById("toggleThemeBtn");
     const challengeModeBtn = document.getElementById("challengeModeBtn");
+    const musicBtn = document.getElementById("musicBtn");
+    const bgMusic = document.getElementById("bgMusic");
+
+    let score = 0;
+    let timeLeft = 30;
+    let level = 1;
+    let boxSize = 50;
+    let gameInterval;
+    let timerInterval;
+    let highScore = localStorage.getItem("highScore") || 0;
+    let isDarkTheme = false;
+    let challengeMode = false;
+    let challengeClicks = 0;
+    const challengeTarget = 10;
+    let musicOn = true;
+
+    function updateScoreBoard() {
+      scoreBoard.innerText = `Score: ${score} | Time left: ${timeLeft} | Level: ${level} | High Score: ${highScore}`;
+    }
+
+    function randomPosition(max) {
+      return Math.floor(Math.random() * (max - boxSize));
+    }
+
+    function createBox() {
+      const box = document.createElement("div");
+      box.className = "box";
+      box.style.width = boxSize + "px";
+      box.style.height = boxSize + "px";
+      box.style.top = randomPosition(gameArea.clientHeight) + "px";
+      box.style.left = randomPosition(gameArea.clientWidth) + "px";
+
+      box.onclick = function () {
+        score++;
+        if (score > highScore) {
+          highScore = score;
+          localStorage.setItem("highScore", highScore);
+        }
+
+        if (challengeMode) {
+          challengeClicks++;
+          if (challengeClicks >= challengeTarget) {
+            const used = 30 - timeLeft;
+            alert(`🎉 Challenge Complete!\nClicked ${challengeTarget} boxes in ${used} seconds.`);
+            stopGame();
+            return;
+          }
+        }
+
+        updateScoreBoard();
+        box.remove();
+        createBox();
+      };
+
+      gameArea.appendChild(box);
+    }
+
+    function startGame() {
+      score = 0;
+      timeLeft = 30;
+      level = 1;
+      boxSize = 50;
+      challengeClicks = 0;
+      updateScoreBoard();
+      gameArea.innerHTML = "";
+      createBox();
+
+      clearInterval(gameInterval);
+      clearInterval(timerInterval);
+
+      gameInterval = setInterval(() => {
+        if (score > 0 && score % 10 === 0) {
+          level = Math.floor(score / 10) + 1;
+          boxSize = Math.max(20, 50 - (level - 1) * 5);
+        }
+        gameArea.innerHTML = "";
+        createBox();
+      }, Math.max(400 - level * 30, 150));
+
+      timerInterval = setInterval(() => {
+        timeLeft--;
+        updateScoreBoard();
+        if (timeLeft <= 0) {
+          alert(`⏰ Time's up!\nFinal Score: ${score}`);
+          stopGame();
+        }
+      }, 1000);
+
+      if (musicOn) bgMusic.play();
+    }
+
+    function stopGame() {
+      clearInterval(gameInterval);
+      clearInterval(timerInterval);
+      gameArea.innerHTML = "";
+      updateScoreBoard();
+      bgMusic.pause();
+      bgMusic.currentTime = 0;
+    }
+
+    startBtn.onclick = () => {
+      challengeMode = false;
+      startGame();
+    };
+
+    toggleThemeBtn.onclick = () => {
+      isDarkTheme = !isDarkTheme;
+      document.body.classList.toggle("dark", isDarkTheme);
+    };
+
+    challengeModeBtn.onclick = () => {
+      challengeMode = true;
+      startGame();
+    };
+
+    musicBtn.onclick = () => {
+      musicOn = !musicOn;
+      musicBtn.innerText = musicOn ? "🔊 Music" : "🔇 Muted";
+      if (!musicOn) {
+        bgMusic.pause();
+      } else if (timeLeft > 0) {
+        bgMusic.play();
+      }
+    };
+
+    updateScoreBoard();
+  </script>
+</body>
+</html>
