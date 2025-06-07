@@ -2,110 +2,112 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Click the Box Game</title>
   <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      font-family: Arial, sans-serif;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f0f8ff;
+      color: #333;
+      transition: background-color 0.5s ease, color 0.5s ease;
+    }
+    body.dark {
+      background-color: #121212;
+      color: #f0f0f0;
+    }
+    .container {
+      max-width: 700px;
+      margin: auto;
+      padding: 20px;
       text-align: center;
-      background: #f0f8ff;
-      margin: 0;
-      padding: 0;
     }
-
     h1 {
-      margin-top: 20px;
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+      color: #0077b6;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+      animation: popIn 0.6s ease-out;
     }
-
+    @keyframes popIn {
+      0% { transform: scale(0.8); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    #scoreBoard {
+      font-size: 18px;
+      margin: 10px 0 20px;
+      padding: 10px;
+      background: #ffffffcc;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    body.dark #scoreBoard {
+      background: #1e1e1ecc;
+    }
     #gameArea {
       position: relative;
       width: 100%;
-      height: 80vh;
+      height: 60vh;
       background-color: #e6f2ff;
       border: 2px solid #0099cc;
-      overflow: hidden;
       margin-top: 20px;
+      overflow: hidden;
+      border-radius: 12px;
+      box-shadow: inset 0 0 10px rgba(0,0,0,0.1);
     }
-
+    body.dark #gameArea {
+      background-color: #222;
+      border-color: #66ccff;
+    }
     .box {
       position: absolute;
-      width: 50px;
-      height: 50px;
-      background-color: #ff6666;
-      cursor: pointer;
       border-radius: 10px;
-    }
-
-    #scoreBoard {
-      margin-top: 20px;
-      font-size: 18px;
-    }
-
-    button {
-      padding: 10px 20px;
-      font-size: 16px;
-      margin-top: 10px;
       cursor: pointer;
+      background: linear-gradient(145deg, #ff6666, #ff4d4d);
+      box-shadow: 2px 2px 8px rgba(0,0,0,0.2);
+      transition: transform 0.1s, background 0.3s;
+      animation: popUp 0.2s ease-out;
+    }
+    @keyframes popUp {
+      0% { transform: scale(0.5); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .box:hover {
+      transform: scale(1.1);
+      background: linear-gradient(145deg, #ff4d4d, #ff3333);
+    }
+    button {
+      margin: 10px 5px;
+      padding: 12px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      border-radius: 8px;
+      border: none;
+      background-color: #0099cc;
+      color: white;
+      transition: background-color 0.3s ease, transform 0.2s;
+      box-shadow: 1px 2px 6px rgba(0,0,0,0.2);
+    }
+    button:hover {
+      background-color: #007799;
+      transform: scale(1.05);
+    }
+    button:active {
+      transform: scale(0.98);
     }
   </style>
 </head>
 <body>
-  <h1>🎯 Click the Box!</h1>
-  <div id="scoreBoard">Score: 0 | Time left: 30</div>
-  <button onclick="startGame()">Start Game</button>
-  <div id="gameArea"></div>
-
+  <div class="container">
+    <h1>🎯 Click the Box!</h1>
+    <div id="scoreBoard">Score: 0 | Time left: 30 | Level: 1 | High Score: 0</div>
+    <button id="startBtn">Start Game</button>
+    <button id="toggleThemeBtn">Toggle Theme</button>
+    <button id="challengeModeBtn">Challenge Mode</button>
+    <div id="gameArea"></div>
+  </div>
   <script>
-    let score = 0;
-    let timeLeft = 30;
-    let gameInterval;
-    let timerInterval;
-
-    function randomPosition(max) {
-      return Math.floor(Math.random() * (max - 50));
-    }
-
-    function createBox() {
-      const box = document.createElement("div");
-      box.className = "box";
-      box.style.top = randomPosition(window.innerHeight * 0.8) + "px";
-      box.style.left = randomPosition(window.innerWidth) + "px";
-
-      box.onclick = function () {
-        score++;
-        document.getElementById("scoreBoard").innerText = `Score: ${score} | Time left: ${timeLeft}`;
-        box.remove();
-        createBox();
-      };
-
-      document.getElementById("gameArea").appendChild(box);
-    }
-
-    function startGame() {
-      score = 0;
-      timeLeft = 30;
-      document.getElementById("scoreBoard").innerText = `Score: ${score} | Time left: ${timeLeft}`;
-      document.getElementById("gameArea").innerHTML = "";
-
-      createBox();
-
-      gameInterval = setInterval(() => {
-        const boxes = document.querySelectorAll(".box");
-        boxes.forEach(b => b.remove());
-        createBox();
-      }, 1000);
-
-      timerInterval = setInterval(() => {
-        timeLeft--;
-        document.getElementById("scoreBoard").innerText = `Score: ${score} | Time left: ${timeLeft}`;
-        if (timeLeft <= 0) {
-          clearInterval(gameInterval);
-          clearInterval(timerInterval);
-          document.getElementById("gameArea").innerHTML = "";
-          alert("Time's up! Your score: " + score);
-        }
-      }, 1000);
-    }
-  </script>
-</body>
-</html>
+    const gameArea = document.getElementById("gameArea");
+    const scoreBoard = document.getElementById("scoreBoard");
+    const startBtn = document.getElementById("startBtn");
+    const toggleThemeBtn = document.getElementById("toggleThemeBtn");
+    const challengeModeBtn = document.getElementById("challengeModeBtn");
